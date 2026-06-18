@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/khanh030106/w10-k8s_security.git
-    path: argocd/apps
+    path: temp/argocd/apps
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc

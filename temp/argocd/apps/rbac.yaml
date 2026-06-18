@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/khanh030106/w10-k8s_security.git
-    path: rbac
+    path: temp/rbac
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
