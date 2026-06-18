@@ -1,20 +1,25 @@
-# Lab 5: app-of-apps root
-# Root App: App of Apps pattern - quản lý tất cả child applications
+# ArgoCD Application for Gatekeeper Constraints
+# Deploy constraints sau templates
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root
+  name: gatekeeper-constraints
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"  # Sau templates
 spec:
   project: default
   source:
     repoURL: https://github.com/khanh030106/w10-k8s_security.git
-    path: argocd/apps
+    path: gatekeeper/constraints
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: gatekeeper-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

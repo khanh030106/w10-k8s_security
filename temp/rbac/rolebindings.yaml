@@ -1,0 +1,48 @@
+# RBAC RoleBindings for Lab 1.1
+# Gắn roles cho 3 users: alice, bob, carol
+
+---
+# RoleBinding 1: alice → developer-role (chỉ trong namespace demo)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: alice-developer-binding
+  namespace: demo
+subjects:
+- kind: User
+  name: alice
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ClusterRoleBinding 2: bob → sre-role (toàn cluster)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bob-sre-binding
+subjects:
+- kind: User
+  name: bob
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: sre-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ClusterRoleBinding 3: carol → viewer-role (toàn cluster)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: carol-viewer-binding
+subjects:
+- kind: User
+  name: carol
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: viewer-role
+  apiGroup: rbac.authorization.k8s.io

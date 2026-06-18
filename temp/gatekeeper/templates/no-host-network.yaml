@@ -1,0 +1,36 @@
+# ConstraintTemplate: Cấm hostNetwork: true
+# Nguồn: gatekeeper-library
+
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostnetworkingports
+  annotations:
+    description: "Controls usage of host network namespace."
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostNetworkingPorts
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            hostNetwork:
+              type: boolean
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spsphostnetworkingports
+
+        violation[{"msg": msg}] {
+          input.review.object.spec.hostNetwork == true
+          not input.parameters.hostNetwork
+          msg := "Using hostNetwork is not allowed"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.object.spec.hostNetwork == true
+          input.parameters.hostNetwork == false
+          msg := "Using hostNetwork is not allowed"
+        }

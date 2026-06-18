@@ -1,0 +1,42 @@
+# RBAC Roles for Lab 1.1
+# 3 vai trò: developer (alice), sre (bob), viewer (carol)
+
+---
+# Role 1: Developer - alice
+# Quyền: CRUD workload (deployments, pods, services) trong namespace demo
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer-role
+  namespace: demo
+rules:
+- apiGroups: ["", "apps"]
+  resources: ["deployments", "pods", "services", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+# ClusterRole 2: SRE - bob
+# Quyền: Xem + thao tác pods toàn cluster (mọi namespace)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sre-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+
+---
+# ClusterRole 3: Viewer - carol
+# Quyền: Chỉ đọc (get, list, watch) toàn cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: viewer-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["get", "list", "watch"]

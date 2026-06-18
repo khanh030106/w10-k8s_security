@@ -1,15 +1,18 @@
-# Lab 5: app-of-apps root
-# Root App: App of Apps pattern - quản lý tất cả child applications
+# ArgoCD Application for RBAC
+# Quản lý roles và rolebindings qua GitOps
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root
+  name: rbac
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"  # Deploy sớm
 spec:
   project: default
   source:
     repoURL: https://github.com/khanh030106/w10-k8s_security.git
-    path: argocd/apps
+    path: rbac
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
@@ -18,3 +21,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

@@ -1,0 +1,44 @@
+# ConstraintTemplate: Bắt buộc có resources.limits
+# Nguồn: gatekeeper-library
+
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredresources
+  annotations:
+    description: "Requires containers to have defined resources limits and requests."
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredResources
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            limits:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredresources
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          provided := {resource_type | container.resources.limits[resource_type]}
+          required := {resource_type | resource_type := input.parameters.limits[_]}
+          missing := required - provided
+          count(missing) > 0
+          msg := sprintf("Container <%v> does not have <%v> limits defined", [container.name, missing])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          provided := {resource_type | container.resources.limits[resource_type]}
+          required := {resource_type | resource_type := input.parameters.limits[_]}
+          missing := required - provided
+          count(missing) > 0
+          msg := sprintf("InitContainer <%v> does not have <%v> limits defined", [container.name, missing])
+        }

@@ -1,0 +1,71 @@
+# ConstraintTemplate: Cấm chạy container với root user (UID 0)
+# Nguồn: gatekeeper-library
+
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspallowedusers
+  annotations:
+    description: "Controls the user and group IDs of the container and some volumes."
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPAllowedUsers
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            runAsUser:
+              type: object
+              properties:
+                rule:
+                  type: string
+                ranges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spspallowedusers
+
+        violation[{"msg": msg}] {
+          fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
+          field := fields[_]
+          container := input.review.object.spec.containers[_]
+          rule := input.parameters.runAsUser.rule
+          provided_user := container.securityContext[field]
+          not accept_users(rule, provided_user)
+          msg := sprintf("Container <%v> has invalid <%v> <%v>. Allowed rule: %v", [container.name, field, provided_user, rule])
+        }
+
+        violation[{"msg": msg}] {
+          field := "runAsUser"
+          container := input.review.object.spec.containers[_]
+          not container.securityContext
+          not input.review.object.spec.securityContext[field]
+          msg := sprintf("Container <%v> must set securityContext.%v", [container.name, field])
+        }
+
+        violation[{"msg": msg}] {
+          field := "runAsUser"
+          container := input.review.object.spec.containers[_]
+          value := container.securityContext[field]
+          value == 0
+          msg := sprintf("Container <%v> cannot run as root (UID 0)", [container.name])
+        }
+
+        accept_users(rule, provided_user) {
+          rule == "MustRunAsNonRoot"
+          provided_user != 0
+        }
+
+        accept_users(rule, provided_user) {
+          rule == "MayRunAs"
+        }
