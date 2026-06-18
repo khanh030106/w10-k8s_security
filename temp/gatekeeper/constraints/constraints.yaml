@@ -19,6 +19,7 @@ spec:
     - kube-system
     - gatekeeper-system
     - argocd
+    - monitoring
   parameters:
     tags: ["latest"]
 
@@ -40,6 +41,7 @@ spec:
     - kube-system
     - gatekeeper-system
     - argocd
+    - monitoring
   parameters:
     limits: ["cpu", "memory"]
 
@@ -61,6 +63,7 @@ spec:
     - kube-system
     - gatekeeper-system
     - argocd
+    - monitoring
   parameters:
     runAsUser:
       rule: MustRunAsNonRoot
@@ -86,6 +89,7 @@ spec:
     - kube-system
     - gatekeeper-system
     - argocd
+    - monitoring
   parameters:
     hostNetwork: false
 
@@ -105,5 +109,6 @@ spec:
     - kube-system
     - gatekeeper-system
     - argocd
+    - monitoring
   parameters:
     labels: ["owner"]
